@@ -1,4 +1,7 @@
-# Django settings for nestor project.
+import os.path
+
+ROOT = os.path.normpath(os.path.dirname(__file__))
+
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -103,9 +106,7 @@ MIDDLEWARE_CLASSES = (
 ROOT_URLCONF = 'nestor.urls'
 
 TEMPLATE_DIRS = (
-    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
-    # Always use forward slashes, even on Windows.
-    # Don't forget to use absolute paths, not relative paths.
+    os.path.join(ROOT, 'templates'),
 )
 
 INSTALLED_APPS = (
@@ -117,6 +118,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.admin',
 
+    'nestor',
     'dploi_server',
     'south',
 )
