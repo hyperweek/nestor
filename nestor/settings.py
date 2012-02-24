@@ -118,6 +118,7 @@ INSTALLED_APPS = (
     'django.contrib.admin',
 
     'dploi_server',
+    'south',
 )
 
 # A sample logging configuration. The only tangible logging
