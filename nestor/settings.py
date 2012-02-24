@@ -1,6 +1,6 @@
 import os.path
 
-ROOT = os.path.normpath(os.path.dirname(__file__))
+PROJECT_ROOT = os.path.normpath(os.path.dirname(__file__))
 
 
 DEBUG = True
@@ -106,8 +106,10 @@ MIDDLEWARE_CLASSES = (
 ROOT_URLCONF = 'nestor.urls'
 
 TEMPLATE_DIRS = (
-    os.path.join(ROOT, 'templates'),
+    os.path.join(PROJECT_ROOT, 'templates'),
 )
+
+JINJA2_TEMPLATE_DIR = os.path.join(PROJECT_ROOT, 'templates')
 
 INSTALLED_APPS = (
     'django.contrib.auth',
@@ -118,16 +120,23 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.admin',
 
-    'nestor',
     'dploi_server',
+    'kombu.transport.django',
+    'nestor',
     'south',
 )
 
-# A sample logging configuration. The only tangible logging
-# performed by this configuration is to send an email to
-# the site admins on every HTTP 500 error.
-# See http://docs.djangoproject.com/en/dev/topics/logging for
-# more details on how to customize your logging configuration.
+# Queue (Kombu)
+USE_QUEUE = True
+QUEUE = {
+    'transport': 'kombu.transport.django.Transport',
+}
+
+SSH_USER = 'vagrant'
+SSH_PASSWORD = 'vagrant'
+SSH_PORT = 2222
+
+# Logging
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -145,3 +154,15 @@ LOGGING = {
         },
     }
 }
+
+LOGGING_CONFIG = None
+
+import logging
+
+# Configure root logger
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
+handler = logging.StreamHandler()
+handler.setLevel(logging.INFO)
+logger.addHandler(handler)

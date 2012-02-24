@@ -1,3 +1,5 @@
+import logging
+
 from django.contrib import admin
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponseRedirect
@@ -9,6 +11,8 @@ from django.contrib import messages
 
 from dploi_server.models import Deployment
 from dploi_server.admin import DeploymentAdmin as DeploymentAdminLegacy
+
+logger = logging.getLogger('nestor.errors')
 
 
 class DeploymentAdmin(DeploymentAdminLegacy):
@@ -32,9 +36,16 @@ class DeploymentAdmin(DeploymentAdminLegacy):
         return urlpatterns
 
     def apply_view(self, request, object_id, **kwargs):
+        from nestor.queue.client import delay
+        from nestor.queue.tasks import apply_deployment
+
         obj = get_object_or_404(self.model, pk=unquote(object_id))
-        # TODO: handle delayed task
-        messages.success(request, _('Deploying ...'))
+        try:
+            delay(apply_deployment, obj)
+            messages.success(request, _('Deploying ...'))
+        except Exception, e:
+            logger.exception(u'Error applying deployment: %s', e)
+            messages.error(request, u'Error applying deployment: %s' % e)
 
         opts = obj._meta
         info = opts.app_label, opts.module_name

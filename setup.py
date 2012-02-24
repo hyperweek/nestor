@@ -11,7 +11,12 @@ from setuptools import setup, find_packages
 
 install_requires = [
     'Django>=1.2,<1.4',
+    'eventlet>=0.9.15',
+    'Fabric==1.4',
+    'Jinja2==2.6',
+    'kombu>=2.1.0,<3.0',
     'South>=0.7',
+    # dependency_links
     'dploi-server',
 ]
 
