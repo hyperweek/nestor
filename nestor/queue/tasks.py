@@ -43,7 +43,7 @@ def apply_deployment(deployment, **kwargs):
                 'group': env.user,
                 'app_name': app.name,
                 'app_domain': domain,
-                'app_user': app_user.user,
+                'app_user': app_user,
                 'is_live': deployment.is_live,
             },
             use_jinja=True, template_dir=settings.JINJA2_TEMPLATE_DIR,

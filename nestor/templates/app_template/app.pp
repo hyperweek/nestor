@@ -1,8 +1,4 @@
-class { 'saas':
-  user  => '{{ user }}',
-  group => '{{ group }}',
-}
-
+include saas
 saas::instance{ "{{ app_name }}":
   domain => "{{ app_domain }}",
   user   => {
