@@ -9,7 +9,7 @@ nestor.queue.tasks
 
 def deploy(deployment, **kwargs):
     """
-    Deploy an applicaiton to a remote machine.
+    Deploy an application to a remote machine.
 
     First, it generates a puppet manifest, then connect to the
     remote machine and call puppet apply with the generated manifest
