@@ -7,7 +7,7 @@ nestor.queue.tasks
 """
 
 
-def apply_deployment(deployment, **kwargs):
+def deploy(deployment, **kwargs):
     """
     Deploy an applicaiton to a remote machine.
 

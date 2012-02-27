@@ -37,11 +37,11 @@ class DeploymentAdmin(DeploymentAdminLegacy):
 
     def apply_view(self, request, object_id, **kwargs):
         from nestor.queue.client import delay
-        from nestor.queue.tasks import apply_deployment
+        from nestor.queue.tasks import deploy
 
         obj = get_object_or_404(self.model, pk=unquote(object_id))
         try:
-            delay(apply_deployment, obj)
+            delay(deploy, obj)
             messages.success(request, _('Deploying ...'))
         except Exception, e:
             logger.exception(u'Error applying deployment: %s', e)
