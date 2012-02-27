@@ -1,0 +1,11 @@
+Welcome to hw.io!
+
+We're thrilled you've joined the world's largest social publishing community. Here's your hw.io username and password:
+
+Username: {{ app_user.username }}
+
+Password: {{ app_user.raw_password }}
+
+You're hw.io instance is available from : http://{{ app_domain }}/
+
+P.S. The first time you sign-in, change your password (http://{{ app_domain }}/you/password/) for maximum security.

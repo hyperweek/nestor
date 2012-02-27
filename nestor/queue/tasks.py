@@ -16,6 +16,8 @@ def deploy(deployment, **kwargs):
     as parameter.
     """
     from django.conf import settings
+    from django.template.loader import render_to_string
+    from django.core.mail import send_mail
     from fabric.api import env, sudo
     from fabric.contrib.files import upload_template
     from fabric.network import disconnect_all
@@ -35,17 +37,19 @@ def deploy(deployment, **kwargs):
         env.password = SSH_PASSWORD
         env.timeout = 60 * 10
 
+        context = {
+            'user': env.user,
+            'group': env.user,
+            'app_name': app.name,
+            'app_domain': domain,
+            'app_user': app_user,
+            'is_live': deployment.is_live,
+        }
+
         upload_template(
             filename='app_template/app.pp',
             destination='/usr/share/puppet/manifests/%s.pp' % app,
-            context={
-                'user': env.user,
-                'group': env.user,
-                'app_name': app.name,
-                'app_domain': domain,
-                'app_user': app_user,
-                'is_live': deployment.is_live,
-            },
+            context=context,
             use_jinja=True, template_dir=settings.JINJA2_TEMPLATE_DIR,
             use_sudo=True)
 
@@ -60,10 +64,15 @@ def deploy(deployment, **kwargs):
         if result.failed:
             raise Exception(result.return_code, result.stderr)
 
-        if deployment.is_live:
-            # TODO: send an email
-            pass
+        if deployment.is_live and app_user.notified == False:
+            subject = render_to_string('mail/deployed_subject.txt', context)
+            body = render_to_string('mail/deployed_body.txt', context)
+
+            send_mail(subject, body, settings.DEFAULT_FROM_EMAIL,
+                [app_user.email], fail_silently=True)
+
+            app_user.notified = True
+            app_user.save()
 
     finally:
-        print 'Disconnecting ...'
         disconnect_all()
