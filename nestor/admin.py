@@ -12,6 +12,9 @@ from django.contrib import messages
 from dploi_server.models import Deployment
 from dploi_server.admin import DeploymentAdmin as DeploymentAdminLegacy
 
+from nestor.queue.client import delay
+from nestor.queue.tasks import deploy
+
 logger = logging.getLogger('nestor.errors')
 
 
@@ -36,12 +39,9 @@ class DeploymentAdmin(DeploymentAdminLegacy):
         return urlpatterns
 
     def apply_view(self, request, object_id, **kwargs):
-        from nestor.queue.client import delay
-        from nestor.queue.tasks import deploy
-
         obj = get_object_or_404(self.model, pk=unquote(object_id))
         try:
-            delay(deploy, obj)
+            delay(deploy, obj.pk)
             messages.success(request, _('Deploying ...'))
         except Exception, e:
             logger.exception(u'Error applying deployment: %s', e)

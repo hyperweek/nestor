@@ -7,7 +7,7 @@ nestor.queue.tasks
 """
 
 
-def deploy(deployment, **kwargs):
+def deploy(deploy_id, **kwargs):
     """
     Deploy an application to a remote machine.
 
@@ -18,11 +18,15 @@ def deploy(deployment, **kwargs):
     from django.conf import settings
     from django.template.loader import render_to_string
     from django.core.mail import send_mail
+
     from fabric.api import env, sudo
     from fabric.contrib.files import upload_template
     from fabric.network import disconnect_all
 
+    from dploi_server.models import Deployment
+
     try:
+        deployment = Deployment.objects.get(pk=deploy_id)
         host = deployment.gunicorn_instances.get().service.host
         app = deployment.application
         domain = '%s.%s' % (app.name, host.realm.base_domain)
