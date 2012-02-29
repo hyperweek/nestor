@@ -13,6 +13,7 @@ install_requires = [
     'Django>=1.2,<1.4',
     'eventlet>=0.9.15',
     'django-extensions==0.8',
+    'dnsimple-api==0.1',
     'Fabric==1.4',
     'Jinja2==2.6',
     'kombu>=2.1.0,<3.0',

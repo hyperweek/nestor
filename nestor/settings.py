@@ -132,6 +132,8 @@ QUEUE = {
     'transport': 'kombu.transport.django.Transport',
 }
 
+USE_DNSSIMPLE = False
+
 # Logging
 LOGGING = {
     'version': 1,

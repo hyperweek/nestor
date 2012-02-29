@@ -1,10 +1,11 @@
 """
-nestor.queue.tasks
-~~~~~~~~~~~~~~~~~~~
+nestor.tasks
+~~~~~~~~~~~~
 
 :copyright: (c) 2012 by the Hyperweek Team, see AUTHORS for more details.
 :license: BSD, see LICENSE for more details.
 """
+from nestor.queue.client import delay
 
 
 def setup_and_deploy(request_id, instance_type='trial'):
@@ -15,8 +16,6 @@ def setup_and_deploy(request_id, instance_type='trial'):
         Gunicorn, GunicornInstance)
 
     from nestor.models import WufooRequest
-    from nestor.queue.client import delay
-    from nestor.queue.tasks import deploy
 
     request = WufooRequest.objects.get(pk=request_id)
     HOST_INSTANCES = getattr(settings, 'HOST_INSTANCES', 20)
@@ -55,8 +54,26 @@ def setup_and_deploy(request_id, instance_type='trial'):
     instance.workers = 1
     instance.save()
 
+    if settings.USE_DNSSIMPLE:
+        delay(setup_dns, deployment.pk)
     delay(deploy, deployment.pk)
     request.delete()
+
+
+def setup_dns(deploy_id, **kwargs):
+    from django.conf import settings
+    from dnsimple.api import DNSimple
+    from dploi_server.models import Deployment
+
+    deployment = Deployment.objects.get(pk=deploy_id)
+    host = deployment.gunicorn_instances.get().service.host
+    app = deployment.application
+
+    base_domain = host.realm.base_domain
+
+    dns = DNSimple(settings.DNSIMPLE_USER, settings.DNSIMPLE_PASSWORD)
+    domain = dns.domains[base_domain]
+    domain.add_record(app.name, 'ALIAS', host.name)
 
 
 def deploy(deploy_id, force_delete=False, **kwargs):
@@ -68,8 +85,6 @@ def deploy(deploy_id, force_delete=False, **kwargs):
     as parameter.
     """
     from django.conf import settings
-    from django.template.loader import render_to_string
-    from django.core.mail import send_mail
 
     from fabric.api import env, sudo
     from fabric.contrib.files import upload_template
@@ -120,15 +135,37 @@ def deploy(deploy_id, force_delete=False, **kwargs):
         if result.failed:
             raise Exception(result.return_code, result.stderr)
 
-        if deployment.is_live and app_user.notified == False:
-            subject = render_to_string('mail/deployed_subject.txt', context)
-            body = render_to_string('mail/deployed_body.txt', context)
-
-            send_mail(subject, body, settings.DEFAULT_FROM_EMAIL,
-                [app_user.email], fail_silently=True)
-
-            app_user.notified = True
-            app_user.save()
+        delay(notify_user, deploy_id)
 
     finally:
         disconnect_all()
+
+
+def notify_user(deploy_id, **kwargs):
+    from django.conf import settings
+    from django.template.loader import render_to_string
+    from django.core.mail import send_mail
+
+    from dploi_server.models import Deployment
+
+    deployment = Deployment.objects.get(pk=deploy_id)
+    host = deployment.gunicorn_instances.get().service.host
+    app = deployment.application
+    domain = '%s.%s' % (app.name, host.realm.base_domain)
+    user = deployment.user_instances.get()
+
+    if deployment.is_live and user.notified == False:
+        context = {
+            'app': app,
+            'app_domain': domain,
+            'user': user,
+        }
+
+        subject = render_to_string('mail/deployed_subject.txt', context)
+        body = render_to_string('mail/deployed_body.txt', context)
+
+        send_mail(subject, body, settings.DEFAULT_FROM_EMAIL,
+            [user.email], fail_silently=False)
+
+        user.notified = True
+        user.save()

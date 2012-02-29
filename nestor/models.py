@@ -9,7 +9,7 @@ from django.db import models
 from django_extensions.db.fields.json import JSONField
 
 from nestor.queue.client import delay
-from nestor.queue.tasks import setup_and_deploy
+from nestor.tasks import setup_and_deploy
 
 PRIORITIES = (
     ("1", "high"),
