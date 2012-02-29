@@ -8,5 +8,5 @@ saas::instance{ "{{ app_name }}":
     'first_name' => '{{ app_user.first_name }}',
     'last_name'  => '{{ app_user.last_name }}',
   },
-  ensure => {% if is_live %}'present'{% else %}'absent'{% endif %},
+  ensure => {% if enabled %}'present'{% else %}'absent'{% endif %},
 }

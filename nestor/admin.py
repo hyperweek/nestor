@@ -12,10 +12,24 @@ from django.contrib import messages
 from dploi_server.models import Deployment
 from dploi_server.admin import DeploymentAdmin as DeploymentAdminLegacy
 
+from nestor.models import WufooRequest
 from nestor.queue.client import delay
 from nestor.queue.tasks import deploy
 
-logger = logging.getLogger('nestor.errors')
+logger = logging.getLogger('nestor')
+
+
+class WufooRequestAdmin(admin.ModelAdmin):
+    list_display = ('wufoo_id', 'network_name', 'company', 'when_added', 'priority')
+    list_filter = ['priority', 'when_added']
+    ordering = ('-when_added',)
+    date_hierarchy = 'when_added'
+
+    def user(self, obj):
+        return u"%s %s <%s>" % (obj.first_name, obj.last_name, obj.email)
+    user.short_description = _('user')
+
+admin.site.register(WufooRequest, WufooRequestAdmin)
 
 
 class DeploymentAdmin(DeploymentAdminLegacy):

@@ -126,15 +126,11 @@ INSTALLED_APPS = (
     'south',
 )
 
-# Queue (Kombu)
-USE_QUEUE = True
+# Queue configuration
+USE_QUEUE = False
 QUEUE = {
     'transport': 'kombu.transport.django.Transport',
 }
-
-SSH_USER = 'vagrant'
-SSH_PASSWORD = 'vagrant'
-SSH_PORT = 2222
 
 # Logging
 LOGGING = {
@@ -155,14 +151,7 @@ LOGGING = {
     }
 }
 
-LOGGING_CONFIG = None
-
-import logging
-
-# Configure root logger
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
-
-handler = logging.StreamHandler()
-handler.setLevel(logging.INFO)
-logger.addHandler(handler)
+try:
+    from local_settings import *
+except ImportError:
+    pass

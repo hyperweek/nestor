@@ -2,12 +2,64 @@
 nestor.queue.tasks
 ~~~~~~~~~~~~~~~~~~~
 
-:copyright: (c) 2010-2012 by the Hyperweek Team, see AUTHORS for more details.
+:copyright: (c) 2012 by the Hyperweek Team, see AUTHORS for more details.
 :license: BSD, see LICENSE for more details.
 """
 
 
-def deploy(deploy_id, **kwargs):
+def setup_and_deploy(request_id, instance_type='trial'):
+    from django.conf import settings
+    from django.db.models import Count
+
+    from dploi_server.models import (Application, Deployment, UserInstance,
+        Gunicorn, GunicornInstance)
+
+    from nestor.models import WufooRequest
+    from nestor.queue.client import delay
+    from nestor.queue.tasks import deploy
+
+    request = WufooRequest.objects.get(pk=request_id)
+    HOST_INSTANCES = getattr(settings, 'HOST_INSTANCES', 20)
+
+    hosts = Gunicorn.objects.filter(is_enabled=True)\
+        .annotate(num_instances=Count('instances'))\
+        .exclude(num_instances__gte=HOST_INSTANCES)\
+        .order_by('-num_instances')
+
+    if not hosts:
+        request.defer()
+        raise Exception('No host available for request #%s' % request.pk)
+
+    application = Application()
+    application.name = request.network_name
+    application.verbose_name = request.company
+    application.save()
+
+    deployment = Deployment()
+    deployment.application = application
+    deployment.is_live = True
+    deployment.name = instance_type
+    deployment.save()
+
+    user = UserInstance()
+    user.deployment = deployment
+    user.username = request.username
+    user.email = request.email
+    user.first_name = request.first_name
+    user.last_name = request.last_name
+    user.save()
+
+    instance = GunicornInstance()
+    instance.service = hosts[0]
+    instance.deployment = deployment
+    instance.workers = 1
+    instance.save()
+
+    delay(deploy, deployment.pk)
+    request.delete()
+
+
+def deploy(deploy_id, force_delete=False, **kwargs):
     """
     Deploy an application to a remote machine.
 
@@ -34,7 +86,7 @@ def deploy(deploy_id, **kwargs):
 
         SSH_PORT = getattr(settings, 'SSH_PORT', 22)
         SSH_USER = getattr(settings, 'SSH_USER', 'ubuntu')
-        SSH_PASSWORD = getattr(settings, 'SSH_PASSWORD', '')
+        SSH_PASSWORD = getattr(settings, 'SSH_PASSWORD', None)
 
         env.host_string = '%s@%s:%s' % (SSH_USER, host.private_ipv4, SSH_PORT)
         env.user = SSH_USER
@@ -47,12 +99,12 @@ def deploy(deploy_id, **kwargs):
             'app_name': app.name,
             'app_domain': domain,
             'app_user': app_user,
-            'is_live': deployment.is_live,
+            'enabled': False if force_delete else deployment.is_live,
         }
 
         upload_template(
             filename='app_template/app.pp',
-            destination='/usr/share/puppet/manifests/%s.pp' % app,
+            destination='/usr/share/puppet/manifests/%s.pp' % app.name,
             context=context,
             use_jinja=True, template_dir=settings.JINJA2_TEMPLATE_DIR,
             use_sudo=True)
@@ -61,7 +113,7 @@ def deploy(deploy_id, **kwargs):
             'puppet',
             'apply',
             '--modulepath=/usr/share/puppet/modules/',
-            '/usr/share/puppet/manifests/%s.pp' % app,
+            '/usr/share/puppet/manifests/%s.pp' % app.name,
         ])
         result = sudo(command, combine_stderr=False)
 
