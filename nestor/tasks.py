@@ -102,10 +102,12 @@ def deploy(deploy_id, force_delete=False, **kwargs):
         SSH_PORT = getattr(settings, 'SSH_PORT', 22)
         SSH_USER = getattr(settings, 'SSH_USER', 'ubuntu')
         SSH_PASSWORD = getattr(settings, 'SSH_PASSWORD', None)
+        SSH_KEYFILE = getattr(settings, 'SSH_KEYFILE', None)
 
         env.host_string = '%s@%s:%s' % (SSH_USER, host.private_ipv4, SSH_PORT)
         env.user = SSH_USER
         env.password = SSH_PASSWORD
+        env.key_filename = SSH_KEYFILE
         env.timeout = 60 * 10
 
         context = {
