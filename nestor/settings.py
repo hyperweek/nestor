@@ -134,6 +134,8 @@ QUEUE = {
 
 USE_DNSSIMPLE = False
 
+PUPPET_BIN = '/var/lib/gems/1.8/bin/puppet'
+
 # Logging
 LOGGING = {
     'version': 1,

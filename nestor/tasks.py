@@ -127,7 +127,7 @@ def deploy(deploy_id, force_delete=False, **kwargs):
             use_sudo=True)
 
         command = ' '.join([
-            'puppet',
+            settings.PUPPET_BIN,
             'apply',
             '--modulepath=/usr/share/puppet/modules/',
             '/usr/share/puppet/manifests/%s.pp' % app.name,
