@@ -23,10 +23,7 @@ class Broker(object):
         if hasattr(self, '_connection'):
             return self._connection
 
-        if self.broker_url == 'django://':
-            self._connection = BrokerConnection(transport='kombu.transport.django.Transport')
-        else:
-            self._connection = BrokerConnection(self.broker_url)
+        self._connection = BrokerConnection(self.broker_url)
 
         with producers[self.connection].acquire(block=False) as producer:
             for queue in task_queues:

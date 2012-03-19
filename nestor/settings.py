@@ -128,7 +128,7 @@ INSTALLED_APPS = (
 
 # Queue configuration
 USE_QUEUE = False
-BROKER_URL = 'django://',
+BROKER_URL = 'django://'
 
 USE_DNSSIMPLE = False
 
