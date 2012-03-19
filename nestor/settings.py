@@ -128,9 +128,7 @@ INSTALLED_APPS = (
 
 # Queue configuration
 USE_QUEUE = False
-QUEUE = {
-    'transport': 'kombu.transport.django.Transport',
-}
+BROKER_URL = 'django://',
 
 USE_DNSSIMPLE = False
 

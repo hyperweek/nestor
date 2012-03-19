@@ -16,14 +16,17 @@ from kombu.pools import producers
 
 
 class Broker(object):
-    def __init__(self, config):
-        self.config = config
+    def __init__(self, broker_url):
+        self.broker_url = broker_url
 
     def _get_connection(self):
         if hasattr(self, '_connection'):
             return self._connection
 
-        self._connection = BrokerConnection(**self.config)
+        if self.broker_url == 'django://':
+            self._connection = BrokerConnection(transport='kombu.transport.django.Transport')
+        else:
+            self._connection = BrokerConnection(self.broker_url)
 
         with producers[self.connection].acquire(block=False) as producer:
             for queue in task_queues:
@@ -58,7 +61,7 @@ class EagerBroker(Broker):
         return func(*args, **kwargs)
 
 if not settings.USE_QUEUE:
-    broker = EagerBroker(settings.QUEUE)
+    broker = EagerBroker(settings.BROKER_URL)
 else:
-    broker = Broker(settings.QUEUE)
+    broker = Broker(settings.BROKER_URL)
 delay = broker.delay
