@@ -120,8 +120,8 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.admin',
 
+    'djutils',
     'dploi_server',
-    'kombu.transport.django',
     'nestor',
     'south',
 )

@@ -8,8 +8,7 @@ nestor.models
 from django.db import models
 from django_extensions.db.fields.json import JSONField
 
-from nestor.queue.client import delay
-from nestor.tasks import setup_and_deploy
+from nestor.commands import setup_and_deploy
 
 PRIORITIES = (
     ("1", "high"),
@@ -67,7 +66,7 @@ class Request(models.Model):
             return False
 
     def process(self):
-        delay(setup_and_deploy, self.pk)
+        setup_and_deploy(self.pk)
 
 
 class WufooRequest(Request):

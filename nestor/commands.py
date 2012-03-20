@@ -1,13 +1,14 @@
 """
-nestor.tasks
-~~~~~~~~~~~~
+nestor.commands
+~~~~~~~~~~~~~~~
 
 :copyright: (c) 2012 by the Hyperweek Team, see AUTHORS for more details.
 :license: BSD, see LICENSE for more details.
 """
-from nestor.queue.client import delay
+from djutils.queue.decorators import queue_command
 
 
+@queue_command
 def setup_and_deploy(request_id, **kwargs):
     from django.conf import settings
     from django.db.models import Count
@@ -56,11 +57,13 @@ def setup_and_deploy(request_id, **kwargs):
     instance.save()
 
     if settings.USE_DNSSIMPLE:
-        delay(setup_dns, deployment.pk)
-    delay(deploy, deployment.pk)
+        setup_dns(deployment.pk)
+
+    deploy(deployment.pk)
     request.delete()
 
 
+@queue_command
 def setup_dns(deploy_id, **kwargs):
     from django.conf import settings
     from dnsimple.api import DNSimple
@@ -77,6 +80,7 @@ def setup_dns(deploy_id, **kwargs):
     domain.add_record(app.name, 'ALIAS', host.name)
 
 
+@queue_command
 def deploy(deploy_id, **kwargs):
     """
     Deploy an application to a remote machine.
@@ -139,12 +143,13 @@ def deploy(deploy_id, **kwargs):
             raise Exception(result.return_code, result.stderr)
 
         if deployment.is_live and not app_user.notified:
-            delay(notify_user, deploy_id)
+            notify_user(deploy_id)
 
     finally:
         disconnect_all()
 
 
+@queue_command
 def notify_user(deploy_id, **kwargs):
     from django.conf import settings
     from django.template.loader import render_to_string

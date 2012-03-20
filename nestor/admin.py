@@ -24,8 +24,7 @@ from dploi_server.admin import DeploymentAdmin as DeploymentAdminLegacy
 from dploi_server.admin import HostAdmin as HostAdminLegacy
 
 from nestor.models import WufooRequest
-from nestor.queue.client import delay
-from nestor.tasks import deploy
+from nestor.commands import deploy
 
 logger = logging.getLogger('nestor')
 
@@ -111,7 +110,7 @@ class DeploymentAdmin(DeploymentAdminLegacy):
     def apply_view(self, request, object_id, **kwargs):
         obj = get_object_or_404(self.model, pk=unquote(object_id))
         try:
-            delay(deploy, obj.pk)
+            deploy(obj.pk)
             messages.success(request, _('Deploying ...'))
         except Exception, e:
             logger.exception(u'Error applying deployment: %s', e)
