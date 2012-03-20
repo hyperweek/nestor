@@ -137,7 +137,8 @@ def deploy(deploy_id, force_delete=False, **kwargs):
         if result.failed:
             raise Exception(result.return_code, result.stderr)
 
-        delay(notify_user, deploy_id)
+        if deployment.is_live and not app_user.notified:
+            delay(notify_user, deploy_id)
 
     finally:
         disconnect_all()
@@ -156,18 +157,17 @@ def notify_user(deploy_id, **kwargs):
     domain = '%s.%s' % (app.name, host.realm.base_domain)
     user = deployment.user_instances.get()
 
-    if deployment.is_live and user.notified == False:
-        context = {
-            'app': app,
-            'app_domain': domain,
-            'user': user,
-        }
+    context = {
+        'app': app,
+        'app_domain': domain,
+        'user': user,
+    }
 
-        subject = render_to_string('mail/deployed_subject.txt', context)
-        body = render_to_string('mail/deployed_body.txt', context)
+    subject = render_to_string('mail/deployed_subject.txt', context)
+    body = render_to_string('mail/deployed_body.txt', context)
 
-        send_mail(subject, body, settings.DEFAULT_FROM_EMAIL,
-            [user.email], fail_silently=False)
+    send_mail(subject, body, settings.DEFAULT_FROM_EMAIL,
+        [user.email], fail_silently=False)
 
-        user.notified = True
-        user.save()
+    user.notified = True
+    user.save()
