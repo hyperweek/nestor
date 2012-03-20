@@ -87,7 +87,7 @@ class WufooRequest(Request):
 
     @property
     def username(self):
-        return self.email.split('@')[0]
+        return self.email.split('@')[0].split('+')[0]
 
     @property
     def first_name(self):
