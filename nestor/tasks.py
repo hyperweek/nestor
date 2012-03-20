@@ -87,8 +87,7 @@ def deploy(deploy_id, force_delete=False, **kwargs):
     from django.conf import settings
 
     from fabric.api import env, sudo
-    # from fabric.contrib.files import upload_template
-    from nestor.utils import upload_template
+    from fabric.contrib.files import upload_template
     from fabric.network import disconnect_all
 
     from dploi_server.models import Deployment

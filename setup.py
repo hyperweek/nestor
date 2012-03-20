@@ -14,12 +14,12 @@ install_requires = [
     'eventlet>=0.9.15',
     'django-extensions==0.8',
     'dnsimple-api==0.1',
-    'Fabric==1.4',
     'Jinja2==2.6',
     'kombu>=2.1.0,<3.0',
     'South>=0.7',
     # dependency_links
     'dploi-server',
+    'Fabric',
 ]
 
 setup(
@@ -34,6 +34,7 @@ setup(
     install_requires=install_requires,
     dependency_links=[
         'https://github.com/hyperweek/dploi-server/tarball/develop#egg=dploi-server',
+        'https://github.com/zyegfryed/fabric/tarball/master#egg=Fabric'
     ],
     license='BSD',
     classifiers=[
