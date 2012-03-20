@@ -76,7 +76,7 @@ def setup_dns(deploy_id, **kwargs):
     domain.add_record(app.name, 'ALIAS', host.name)
 
 
-def deploy(deploy_id, force_delete=False, **kwargs):
+def deploy(deploy_id, **kwargs):
     """
     Deploy an application to a remote machine.
 
@@ -116,7 +116,7 @@ def deploy(deploy_id, force_delete=False, **kwargs):
             'app_name': app.name,
             'app_domain': domain,
             'app_user': app_user,
-            'enabled': False if force_delete else deployment.is_live,
+            'enabled': deployment.is_live,
         }
 
         upload_template(
