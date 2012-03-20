@@ -100,8 +100,6 @@ def deploy(deploy_id, **kwargs):
         domain = '%s.%s' % (app.name, host.realm.base_domain)
         app_user = deployment.user_instances.get()
 
-        force_delete = kwargs.get('force_delete', False)
-
         SSH_PORT = getattr(settings, 'SSH_PORT', 22)
         SSH_USER = getattr(settings, 'SSH_USER', 'ubuntu')
         SSH_PASSWORD = getattr(settings, 'SSH_PASSWORD', None)
@@ -119,7 +117,7 @@ def deploy(deploy_id, **kwargs):
             'app_name': app.name,
             'app_domain': domain,
             'app_user': app_user,
-            'enabled': False if force_delete else deployment.is_live,
+            'enabled': deployment.is_live,
         }
 
         upload_template(
