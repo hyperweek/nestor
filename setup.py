@@ -16,6 +16,7 @@ install_requires = [
     'djutils==0.3.2',
     'dnsimple-api==0.1',
     'Jinja2==2.6',
+    'raven==1.4.6',
     'South>=0.7',
     # dependency_links
     'dploi-server',
