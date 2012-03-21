@@ -1,23 +1,21 @@
 """
-nestor.tasks
-~~~~~~~~~~~~
+nestor.commands
+~~~~~~~~~~~~~~~
 
 :copyright: (c) 2012 by the Hyperweek Team, see AUTHORS for more details.
 :license: BSD, see LICENSE for more details.
 """
-from nestor.queue.client import delay
+from djutils.queue.decorators import queue_command
 
 
-def setup_and_deploy(request_id, **kwargs):
+@queue_command
+def setup_and_deploy(request, **kwargs):
     from django.conf import settings
     from django.db.models import Count
 
     from dploi_server.models import (Application, Deployment, UserInstance,
         Gunicorn, GunicornInstance)
 
-    from nestor.models import WufooRequest
-
-    request = WufooRequest.objects.get(pk=request_id)
     instance_type = kwargs.get('instance_type', 'trial')
     HOST_INSTANCES = getattr(settings, 'HOST_INSTANCES', 20)
 
@@ -56,17 +54,17 @@ def setup_and_deploy(request_id, **kwargs):
     instance.save()
 
     if settings.USE_DNSSIMPLE:
-        delay(setup_dns, deployment.pk)
-    delay(deploy, deployment.pk)
+        setup_dns(deployment)
+
+    deploy(deployment)
     request.delete()
 
 
-def setup_dns(deploy_id, **kwargs):
+@queue_command
+def setup_dns(deployment, **kwargs):
     from django.conf import settings
     from dnsimple.api import DNSimple
-    from dploi_server.models import Deployment
 
-    deployment = Deployment.objects.get(pk=deploy_id)
     host = deployment.gunicorn_instances.get().service.host
     app = deployment.application
 
@@ -77,7 +75,8 @@ def setup_dns(deploy_id, **kwargs):
     domain.add_record(app.name, 'ALIAS', host.name)
 
 
-def deploy(deploy_id, **kwargs):
+@queue_command
+def deploy(deployment, **kwargs):
     """
     Deploy an application to a remote machine.
 
@@ -91,10 +90,7 @@ def deploy(deploy_id, **kwargs):
     from fabric.contrib.files import upload_template
     from fabric.network import disconnect_all
 
-    from dploi_server.models import Deployment
-
     try:
-        deployment = Deployment.objects.get(pk=deploy_id)
         host = deployment.gunicorn_instances.get().service.host
         app = deployment.application
         domain = '%s.%s' % (app.name, host.realm.base_domain)
@@ -139,20 +135,18 @@ def deploy(deploy_id, **kwargs):
             raise Exception(result.return_code, result.stderr)
 
         if deployment.is_live and not app_user.notified:
-            delay(notify_user, deploy_id)
+            notify_user(deployment)
 
     finally:
         disconnect_all()
 
 
-def notify_user(deploy_id, **kwargs):
+@queue_command
+def notify_user(deployment, **kwargs):
     from django.conf import settings
     from django.template.loader import render_to_string
     from django.core.mail import send_mail
 
-    from dploi_server.models import Deployment
-
-    deployment = Deployment.objects.get(pk=deploy_id)
     host = deployment.gunicorn_instances.get().service.host
     app = deployment.application
     domain = '%s.%s' % (app.name, host.realm.base_domain)
