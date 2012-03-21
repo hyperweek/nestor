@@ -66,7 +66,7 @@ class Request(models.Model):
             return False
 
     def process(self):
-        setup_and_deploy(self.pk)
+        setup_and_deploy(self)
 
 
 class WufooRequest(Request):

@@ -110,7 +110,7 @@ class DeploymentAdmin(DeploymentAdminLegacy):
     def apply_view(self, request, object_id, **kwargs):
         obj = get_object_or_404(self.model, pk=unquote(object_id))
         try:
-            deploy(obj.pk)
+            deploy(obj)
             messages.success(request, _('Deploying ...'))
         except Exception, e:
             logger.exception(u'Error applying deployment: %s', e)
