@@ -72,10 +72,14 @@ class HostAdmin(HostAdminLegacy):
             if settings.USE_DNSSIMPLE:
                 dns = DNSimple(settings.DNSIMPLE_USER, settings.DNSIMPLE_PASSWORD)
                 domain = dns.domains[base_domain]
-                domain.add_record(obj.name, 'A', obj.public_ipv4)
+                response = domain.add_record(obj.name, 'A', obj.public_ipv4)
 
-            messages.success(request,
-                _('Added record: %s A %s' % (host_domain, obj.public_ipv4)))
+            if response:
+                messages.success(request,
+                    _('Added record: %s A %s' % (host_domain, obj.public_ipv4)))
+            else:
+                messages.error(request,
+                    _('Failed to add record: %s A %s' % (host_domain, obj.public_ipv4)))
         except Exception, e:
             messages.error(request, str(e))
 
