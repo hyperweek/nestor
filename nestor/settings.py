@@ -125,6 +125,7 @@ INSTALLED_APPS = (
 
     'djutils',
     'dploi_server',
+    'mailer',
     'nestor',
     'raven.contrib.django',
     'reversion',

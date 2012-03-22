@@ -13,7 +13,7 @@ install_requires = [
     'Django>=1.2,<1.4',
     'eventlet>=0.9.15',
     'django-extensions==0.8',
-    'django-grappelli==2.3.8',
+    'django-grappelli==2.3.7',
     'django-reversion==1.5.1',
     'djutils==0.3.2',
     'dnsimple-api==0.1',
@@ -22,6 +22,7 @@ install_requires = [
     'raven==1.4.6',
     'South>=0.7',
     # dependency_links
+    'django-mailer',
     'dploi-server',
     'Fabric',
 ]
@@ -37,6 +38,7 @@ setup(
     zip_safe=False,
     install_requires=install_requires,
     dependency_links=[
+        'https://github.com/winhamwr/django-mailer/tarball/master#egg=django-mailer',
         'https://github.com/hyperweek/dploi-server/tarball/develop#egg=dploi-server',
         'https://github.com/zyegfryed/fabric/tarball/master#egg=Fabric'
     ],
