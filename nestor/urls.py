@@ -13,4 +13,5 @@ admin.autodiscover()
 urlpatterns = patterns('',
     url(r'^webhook/$', 'nestor.views.webhook', name='webhook'),
     url(r'^admin/', include(admin.site.urls)),
+    url(r'^grappelli/', include('grappelli.urls')),
 )

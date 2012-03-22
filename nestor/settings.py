@@ -68,7 +68,7 @@ STATIC_URL = '/static/'
 # URL prefix for admin static files -- CSS, JavaScript and images.
 # Make sure to use a trailing slash.
 # Examples: "http://foo.com/static/admin/", "/static/admin/".
-ADMIN_MEDIA_PREFIX = '/static/admin/'
+ADMIN_MEDIA_PREFIX = STATIC_URL + 'grappelli/'
 
 # Additional locations of static files
 STATICFILES_DIRS = (
@@ -112,6 +112,7 @@ TEMPLATE_DIRS = (
 JINJA2_TEMPLATE_DIR = os.path.join(PROJECT_ROOT, 'templates')
 
 INSTALLED_APPS = (
+    'grappelli',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -134,6 +135,8 @@ BROKER_URL = 'django://'
 USE_DNSSIMPLE = False
 
 PUPPET_BIN = '/var/lib/gems/1.8/bin/puppet'
+
+GRAPPELLI_ADMIN_TITLE = 'Nestor Administration'
 
 # Logging
 LOGGING = {
