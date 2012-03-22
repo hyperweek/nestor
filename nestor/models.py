@@ -72,6 +72,9 @@ class Request(models.Model):
 class WufooRequest(Request):
     wufoo_id = models.PositiveIntegerField()
 
+    def __unicode__(self):
+        return u"Request %s from %s" % (self.network_name, self.company)
+
     @property
     def network_name(self):
         return self.request_data['Field3']
