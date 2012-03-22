@@ -125,6 +125,7 @@ INSTALLED_APPS = (
     'dploi_server',
     'nestor',
     'raven.contrib.django',
+    'reversion',
     'south',
 )
 

@@ -17,6 +17,7 @@ from django.contrib.admin.util import unquote
 from django.utils.functional import update_wrapper
 from django.contrib import messages
 
+import reversion
 from dnsimple.api import DNSimple
 
 from dploi_server.models import Deployment, Host
@@ -29,7 +30,7 @@ from nestor.commands import deploy
 logger = logging.getLogger('nestor')
 
 
-class WufooRequestAdmin(admin.ModelAdmin):
+class WufooRequestAdmin(reversion.VersionAdmin):
     list_display = ('wufoo_id', 'network_name', 'company', 'when_added', 'priority')
     list_filter = ['priority', 'when_added']
     ordering = ('-when_added',)

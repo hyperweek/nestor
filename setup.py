@@ -14,6 +14,7 @@ install_requires = [
     'eventlet>=0.9.15',
     'django-extensions==0.8',
     'django-grappelli==2.3.8',
+    'django-reversion==1.5.1',
     'djutils==0.3.2',
     'dnsimple-api==0.1',
     'Jinja2==2.6',
