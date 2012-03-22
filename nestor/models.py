@@ -70,7 +70,7 @@ class Request(models.Model):
 
 
 class WufooRequest(Request):
-    wufoo_id = models.PositiveIntegerField()
+    wufoo_id = models.PositiveIntegerField(unique=True)
 
     def __unicode__(self):
         return u"Request %s from %s" % (self.network_name, self.company)
