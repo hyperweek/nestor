@@ -35,6 +35,7 @@ class WufooRequestAdmin(reversion.VersionAdmin):
     list_filter = ['priority', 'when_added']
     ordering = ('-when_added',)
     date_hierarchy = 'when_added'
+    reversion_format = 'yaml'
 
     def user(self, obj):
         return u"%s %s <%s>" % (obj.first_name, obj.last_name, obj.email)
