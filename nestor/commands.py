@@ -72,7 +72,7 @@ def setup_dns(deployment, **kwargs):
 
     dns = DNSimple(settings.DNSIMPLE_USER, settings.DNSIMPLE_PASSWORD)
     domain = dns.domains[base_domain]
-    domain.add_record(app.name, 'ALIAS', host.name)
+    domain.add_record(app.name, 'ALIAS', host.hostname)
 
 
 @queue_command
