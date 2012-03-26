@@ -77,7 +77,7 @@ class WufooRequest(Request):
 
     @property
     def network_name(self):
-        return self.request_data['Field3']
+        return self.request_data['Field3'].lower()
 
     @property
     def company(self):
