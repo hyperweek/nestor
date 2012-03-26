@@ -5,6 +5,7 @@ nestor.commands
 :copyright: (c) 2012 by the Hyperweek Team, see AUTHORS for more details.
 :license: BSD, see LICENSE for more details.
 """
+from django.db import transaction
 from djutils.queue.decorators import queue_command
 
 
@@ -28,30 +29,31 @@ def setup_and_deploy(request, **kwargs):
         request.defer()
         raise Exception('No host available for request #%s' % request.pk)
 
-    application = Application()
-    application.name = request.network_name
-    application.verbose_name = request.company
-    application.save()
+    with transaction.commit_on_success():
+        application = Application()
+        application.name = request.network_name
+        application.verbose_name = request.company
+        application.save()
 
-    deployment = Deployment()
-    deployment.application = application
-    deployment.is_live = True
-    deployment.name = instance_type
-    deployment.save()
+        deployment = Deployment()
+        deployment.application = application
+        deployment.is_live = True
+        deployment.name = instance_type
+        deployment.save()
 
-    user = UserInstance()
-    user.deployment = deployment
-    user.username = request.username
-    user.email = request.email
-    user.first_name = request.first_name
-    user.last_name = request.last_name
-    user.save()
+        user = UserInstance()
+        user.deployment = deployment
+        user.username = request.username
+        user.email = request.email
+        user.first_name = request.first_name
+        user.last_name = request.last_name
+        user.save()
 
-    instance = GunicornInstance()
-    instance.service = hosts[0]
-    instance.deployment = deployment
-    instance.workers = 1
-    instance.save()
+        instance = GunicornInstance()
+        instance.service = hosts[0]
+        instance.deployment = deployment
+        instance.workers = 1
+        instance.save()
 
     if settings.USE_DNSSIMPLE:
         setup_dns(deployment)

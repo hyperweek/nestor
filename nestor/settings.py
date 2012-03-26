@@ -132,12 +132,6 @@ INSTALLED_APPS = (
     'south',
 )
 
-# Queue configuration
-USE_QUEUE = False
-BROKER_URL = 'django://'
-
-USE_DNSSIMPLE = False
-
 PUPPET_BIN = '/var/lib/gems/1.8/bin/puppet'
 
 GRAPPELLI_ADMIN_TITLE = 'Nestor Administration'

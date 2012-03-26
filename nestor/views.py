@@ -8,6 +8,7 @@ nestor.views
 from django.http import HttpResponse
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
+from django.db import transaction
 
 from django_extensions.db.fields.json import JSONDict
 
@@ -16,6 +17,7 @@ from nestor.models import WufooRequest
 
 @require_POST
 @csrf_exempt
+@transaction.autocommit
 def webhook(request, **kwargs):
     req = WufooRequest()
     req.wufoo_id = request.POST['EntryId']
