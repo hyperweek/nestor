@@ -6,6 +6,8 @@ nestor.models
 :license: BSD, see LICENSE for more details.
 """
 from django.db import models
+from django.template.defaultfilters import slugify
+
 from django_extensions.db.fields.json import JSONField
 
 from nestor.commands import setup_and_deploy
@@ -77,7 +79,7 @@ class WufooRequest(Request):
 
     @property
     def network_name(self):
-        return self.request_data['Field3'].lower()
+        return slugify(self.request_data['Field3'])
 
     @property
     def company(self):
