@@ -1,11 +1,35 @@
-Welcome to hw.io!
+This is your network, delivered by HyperWeek.
 
-We're thrilled you've joined the world's largest social publishing community. Here's your hw.io username and password:
+Thank you for using HW 2.2. While you're still in trial period, we think
+you'll enjoy the app. It's designed to be simple and social from the ground,
+in order to get the most engagement from your users.
 
-Username: {{ user.username }}
+Getting started
+---------------
 
-Password: {{ user.raw_password }}
+We invite you to follow the setup procedure before inviting your contacts. It
+will help your new users to understand the objectives of this network and what
+type of engagement you want to drive.
 
-You're hw.io instance is available from : http://{{ app_domain }}/
+Here's your credentials :
 
-P.S. The first time you sign-in, change your password (http://{{ app_domain }}/you/password/) for maximum security.
+ * username: {{ user.username }}
+ * password: {{ user.raw_password }}
+
+Go ahead and get started with the following link:
+
+http://{{ app_domain }}/login/?next=/first-steps/
+
+Read the FAQ
+------------
+
+Want to understand how/what you can share on HyperWeek ? We have detailed
+extensively the differents ways and types of media you can publish. Let us
+know if you have more questions.
+
+http://bit.ly/hw-faq-users
+
+--
+Raphaël Briner, Founder
+Mail: raphael@hyperweek.com
+Skype: hyperweek

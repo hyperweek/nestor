@@ -1,1 +1,1 @@
-Welcome to hw.io
+Welcome to {{ app_domain }} !
