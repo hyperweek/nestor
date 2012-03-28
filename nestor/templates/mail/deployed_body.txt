@@ -20,6 +20,10 @@ Go ahead and get started with the following link:
 
 http://{{ app_domain }}/login/?next=/first-steps/
 
+Then go to the setup page to make it yours:
+
+http://{{ app_domain }}/setup/
+
 Read the FAQ
 ------------
 
