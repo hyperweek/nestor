@@ -39,6 +39,7 @@ admin.site.register(WufooRequest, WufooRequestAdmin)
 
 
 class HostAdmin(HostAdminLegacy):
+    ordering = ('name',)
     actions = ['delete_selected', 'register']
 
     def register(self, request, queryset):
@@ -66,6 +67,7 @@ admin.site.register(Host, HostAdmin)
 
 
 class DeploymentAdmin(DeploymentAdminLegacy):
+    ordering = ('identifier',)
     actions = ['delete_selected', 'apply']
 
     def apply(self, request, queryset):
