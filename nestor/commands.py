@@ -13,12 +13,14 @@ from djutils.queue.decorators import queue_command
 def setup_and_deploy(request, **kwargs):
     from django.conf import settings
     from django.db.models import Count
+    from django.core.mail import mail_admins
 
     from dploi_server.models import (Application, Deployment, UserInstance,
         Gunicorn, GunicornInstance)
 
     instance_type = kwargs.get('instance_type', 'trial')
     HOST_INSTANCES = getattr(settings, 'HOST_INSTANCES', 20)
+    NOTIFICATION_THRESHOLD = getattr(settings, 'NOTIFICATION_THRESHOLD', 15)
 
     hosts = Gunicorn.objects.filter(is_enabled=True)\
         .annotate(num_instances=Count('instances'))\
@@ -28,6 +30,24 @@ def setup_and_deploy(request, **kwargs):
     if not hosts:
         request.defer()
         raise Exception('No host available for request #%s' % request.pk)
+
+    target = hosts[0]
+    used_slots = target.instances.count()
+    if used_slots >= NOTIFICATION_THRESHOLD:
+        available_slots = HOST_INSTANCES - used_slots
+        host = target.host
+        mail_admins(subject='nestor alert -- Server capacity almost full %s' % host.hostname,
+            message="""Server capacity almost full %s
+
+Action: alert
+Host: %s
+Description: only %d remaning slots available
+
+Please, take any action to prevent overload capacity.
+
+Your faithful employee,
+nestor
+""" % (host.hostname, host.public_ipv4, available_slots))
 
     with transaction.commit_on_success():
         application = Application()
@@ -50,7 +70,7 @@ def setup_and_deploy(request, **kwargs):
         user.save()
 
         instance = GunicornInstance()
-        instance.service = hosts[0]
+        instance.service = target
         instance.deployment = deployment
         instance.workers = 1
         instance.save()

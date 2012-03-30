@@ -132,6 +132,8 @@ INSTALLED_APPS = (
     'south',
 )
 
+EMAIL_SUBJECT_PREFIX = '[Nestor] '
+
 PUPPET_BIN = '/var/lib/gems/1.8/bin/puppet'
 
 GRAPPELLI_ADMIN_TITLE = 'Nestor Administration'
