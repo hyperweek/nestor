@@ -5,8 +5,12 @@ nestor.commands
 :copyright: (c) 2012 by the Hyperweek Team, see AUTHORS for more details.
 :license: BSD, see LICENSE for more details.
 """
+import logging
+
 from django.db import transaction
 from djutils.queue.decorators import queue_command
+
+logger = logging.getLogger('nestor')
 
 
 @queue_command
@@ -29,7 +33,7 @@ def setup_and_deploy(request, **kwargs):
 
     if not hosts:
         request.defer()
-        raise Exception('No host available for request #%s' % request.pk)
+        logger.error('No host available for request #%s' % request.pk)
 
     target = hosts[0]
     used_slots = target.instances.count()
