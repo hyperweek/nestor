@@ -69,6 +69,7 @@ admin.site.register(Host, HostAdmin)
 class DeploymentAdmin(DeploymentAdminLegacy):
     ordering = ('identifier',)
     actions = ['delete_selected', 'apply']
+    list_filter = ('name', 'is_live')
 
     def apply(self, request, queryset):
         for obj in queryset:
