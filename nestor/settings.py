@@ -123,7 +123,6 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.admin',
 
-    'djutils',
     'dploi_server',
     'mailer',
     'nestor',
@@ -137,6 +136,10 @@ EMAIL_SUBJECT_PREFIX = '[Nestor] '
 PUPPET_BIN = '/var/lib/gems/1.8/bin/puppet'
 
 GRAPPELLI_ADMIN_TITLE = 'Nestor Administration'
+
+RQ = {
+    'eager': False,
+}
 
 # Logging
 LOGGING = {

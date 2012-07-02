@@ -7,15 +7,17 @@ nestor.commands
 """
 import logging
 
+from django.conf import settings
+from django.db import connection
 from django.db import transaction
-from djutils.queue.decorators import queue_command
+
+from .decorators import enqueue, raven
 
 logger = logging.getLogger('nestor')
 
 
-@queue_command
+@raven
 def setup_and_deploy(request, **kwargs):
-    from django.conf import settings
     from django.db.models import Count
     from django.core.mail import mail_admins
 
@@ -80,15 +82,14 @@ nestor
         instance.save()
 
     if settings.USE_DNSSIMPLE:
-        setup_dns(deployment)
+        enqueue(setup_dns, deployment)
 
-    deploy(deployment)
+    enqueue(deploy, deployment)
     request.delete()
 
 
-@queue_command
+@raven
 def setup_dns(deployment, **kwargs):
-    from django.conf import settings
     from dnsimple.api import DNSimple
 
     host = deployment.gunicorn_instances.get().service.host
@@ -101,7 +102,7 @@ def setup_dns(deployment, **kwargs):
     domain.add_record(app.name, 'ALIAS', host.hostname)
 
 
-@queue_command
+@raven
 def deploy(deployment, **kwargs):
     """
     Deploy an application to a remote machine.
@@ -110,8 +111,6 @@ def deploy(deployment, **kwargs):
     remote machine and call puppet apply with the generated manifest
     as parameter.
     """
-    from django.conf import settings
-
     from fabric.api import env, sudo
     from fabric.contrib.files import upload_template
     from fabric.network import disconnect_all
@@ -161,15 +160,14 @@ def deploy(deployment, **kwargs):
             raise Exception(result.return_code, result.stderr)
 
         if deployment.is_live and not app_user.notified:
-            notify_user(deployment)
+            enqueue(notify_user, deployment)
 
     finally:
         disconnect_all()
 
 
-@queue_command
+@raven
 def notify_user(deployment, **kwargs):
-    from django.conf import settings
     from django.template.loader import render_to_string
     from django.core.mail import send_mail
 
@@ -192,3 +190,9 @@ def notify_user(deployment, **kwargs):
 
     user.notified = True
     user.save()
+
+
+def close_connection():
+    """Close the connection only if not in eager mode"""
+    if not settings.RQ.get('eager', True):
+        connection.close()

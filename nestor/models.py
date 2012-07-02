@@ -10,7 +10,8 @@ from django.template.defaultfilters import slugify
 
 from django_extensions.db.fields.json import JSONField
 
-from nestor.commands import setup_and_deploy
+from .decorators import enqueue
+from .tasks import setup_and_deploy
 
 PRIORITIES = (
     ("1", "high"),
@@ -68,7 +69,7 @@ class Request(models.Model):
             return False
 
     def process(self):
-        setup_and_deploy(self)
+        enqueue(setup_and_deploy, self)
 
 
 class WufooRequest(Request):

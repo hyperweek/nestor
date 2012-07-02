@@ -15,11 +15,11 @@ install_requires = [
     'django-extensions==0.8',
     'django-grappelli==2.3.7',
     'django-reversion==1.5.1',
-    'djutils==0.3.2',
     'dnsimple-api==0.1',
     'Jinja2==2.6',
     'PyYAML==3.10',
     'raven==1.4.6',
+    'rq==0.1.2',
     'South>=0.7',
     # dependency_links
     'django-mailer',

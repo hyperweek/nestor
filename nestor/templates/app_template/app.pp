@@ -1,3 +1,12 @@
+group { 'puppet':
+    ensure => present,
+}
+
+user { 'puppet':
+    ensure => present,
+    groups => ['puppet'],
+}
+
 include saas
 saas::instance{ "{{ app_name }}":
   domain => "{{ app_domain }}",

@@ -19,8 +19,9 @@ from dploi_server.models import Deployment, Host
 from dploi_server.admin import DeploymentAdmin as DeploymentAdminLegacy
 from dploi_server.admin import HostAdmin as HostAdminLegacy
 
-from nestor.models import WufooRequest
-from nestor.commands import deploy
+from .models import WufooRequest
+from .decorators import enqueue
+from .tasks import deploy
 
 logger = logging.getLogger('nestor')
 
@@ -74,7 +75,7 @@ class DeploymentAdmin(DeploymentAdminLegacy):
     def apply(self, request, queryset):
         for obj in queryset:
             try:
-                deploy(obj)
+                enqueue(deploy, obj)
                 messages.success(request, _('Deploying %s...' % obj.identifier))
             except Exception, e:
                 logger.exception(u'Error deploying %s: %s' % (obj.identifier, e), e)
