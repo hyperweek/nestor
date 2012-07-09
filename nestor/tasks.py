@@ -28,10 +28,12 @@ def setup_and_deploy(request, **kwargs):
     HOST_INSTANCES = getattr(settings, 'HOST_INSTANCES', 20)
     NOTIFICATION_THRESHOLD = getattr(settings, 'NOTIFICATION_THRESHOLD', 15)
 
-    hosts = Gunicorn.objects.filter(is_enabled=True)\
-        .annotate(num_instances=Count('instances'))\
-        .exclude(num_instances__gte=HOST_INSTANCES)\
-        .order_by('-num_instances')
+    hosts = Gunicorn.objects.filter(
+        is_enabled=True,
+        instances__deployment__is_live=True
+    ).annotate(num_instances=Count('instances'))\
+    .exclude(num_instances__gte=HOST_INSTANCES)\
+    .order_by('-num_instances')
 
     if not hosts:
         request.defer()
