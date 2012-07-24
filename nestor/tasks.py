@@ -40,7 +40,7 @@ def setup_and_deploy(request, **kwargs):
         logger.error('No host available for request #%s' % request.pk)
 
     target = hosts[0]
-    used_slots = target.instances.count()
+    used_slots = target.num_instances
     if used_slots >= NOTIFICATION_THRESHOLD:
         available_slots = HOST_INSTANCES - used_slots
         host = target.host
