@@ -86,7 +86,7 @@ nestor
     if settings.USE_DNSSIMPLE:
         enqueue(setup_dns, deployment)
 
-    enqueue(deploy, deployment)
+    enqueue(deploy, deployment, timeout=500)
     request.delete()
 
 

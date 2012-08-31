@@ -75,7 +75,7 @@ class DeploymentAdmin(DeploymentAdminLegacy):
     def apply(self, request, queryset):
         for obj in queryset:
             try:
-                enqueue(deploy, obj)
+                enqueue(deploy, obj, timeout=500)
                 messages.success(request, _('Deploying %s...' % obj.identifier))
             except Exception, e:
                 logger.exception(u'Error deploying %s: %s' % (obj.identifier, e), e)
