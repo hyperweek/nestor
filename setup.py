@@ -19,7 +19,7 @@ install_requires = [
     'Jinja2==2.6',
     'PyYAML==3.10',
     'raven==2.0.5',
-    'rq==0.3.1',
+    'rq==0.2.1',
     'South>=0.7',
     # dependency_links
     'django-mailer',
