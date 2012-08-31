@@ -18,8 +18,8 @@ install_requires = [
     'dnsimple-api==0.1',
     'Jinja2==2.6',
     'PyYAML==3.10',
-    'raven==1.4.6',
-    'rq==0.1.2',
+    'raven==2.0.5',
+    'rq==0.3.1',
     'South>=0.7',
     # dependency_links
     'django-mailer',
