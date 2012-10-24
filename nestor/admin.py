@@ -69,10 +69,22 @@ admin.site.register(Host, HostAdmin)
 
 class DeploymentAdmin(DeploymentAdminLegacy):
     ordering = ('identifier',)
-    actions = ['delete_selected', 'apply']
+    actions = ['apply_selected', 'disable_selected', 'delete_selected']
     list_filter = ('name', 'is_live')
 
-    def apply(self, request, queryset):
+    def disable_selected(self, request, queryset):
+        for obj in queryset:
+            try:
+                obj.is_live = False
+                obj.save()
+                enqueue(deploy, obj, timeout=500)
+                messages.success(request, _('Deploying %s...' % obj.identifier))
+            except Exception, e:
+                logger.exception(u'Error deploying %s: %s' % (obj.identifier, e), e)
+                messages.error(request, u'Error deploying %s: %s' % (obj.identifier, e))
+    disable_selected.short_description = "Disable selected instances"
+
+    def apply_selected(self, request, queryset):
         for obj in queryset:
             try:
                 enqueue(deploy, obj, timeout=500)
@@ -80,7 +92,7 @@ class DeploymentAdmin(DeploymentAdminLegacy):
             except Exception, e:
                 logger.exception(u'Error deploying %s: %s' % (obj.identifier, e), e)
                 messages.error(request, u'Error deploying %s: %s' % (obj.identifier, e))
-    apply.short_description = "Deploy selected instances"
+    apply_selected.short_description = "Deploy selected instances"
 
 admin.site.unregister(Deployment)
 admin.site.register(Deployment, DeploymentAdmin)
