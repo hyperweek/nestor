@@ -36,6 +36,17 @@ class WufooRequestAdmin(reversion.VersionAdmin):
         return u"%s %s <%s>" % (obj.first_name, obj.last_name, obj.email)
     user.short_description = _('user')
 
+    def retry_selected(self, request, queryset):
+        for obj in queryset:
+            try:
+                if obj.retry():
+                    obj.process()
+                    messages.success(request, _('Provisionning #%s...' % obj.wufoo_id))
+            except Exception, e:
+                logger.exception(u'Error provisionning #%s: %s' % (obj.wufoo_id, e), e)
+                messages.error(request, u'Error provisionning #%s: %s' % (obj.wufoo_id, e))
+    retry_selected.short_description = "Retry to provision selected instances"
+
 admin.site.register(WufooRequest, WufooRequestAdmin)
 
 
