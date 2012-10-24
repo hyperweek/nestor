@@ -38,6 +38,7 @@ def setup_and_deploy(request, **kwargs):
     if not hosts:
         request.defer()
         logger.error('No host available for request #%s' % request.pk)
+        return
 
     target = hosts[0]
     used_slots = target.num_instances
