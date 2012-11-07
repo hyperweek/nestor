@@ -89,7 +89,7 @@ class DeploymentAdmin(DeploymentAdminLegacy):
             try:
                 obj.is_live = False
                 obj.save()
-                enqueue(deploy, obj, timeout=500)
+                enqueue(deploy, obj, timeout=1800)
                 messages.success(request, _('Deploying %s...' % obj.identifier))
             except Exception, e:
                 logger.exception(u'Error deploying %s: %s' % (obj.identifier, e), e)
@@ -99,7 +99,7 @@ class DeploymentAdmin(DeploymentAdminLegacy):
     def apply_selected(self, request, queryset):
         for obj in queryset:
             try:
-                enqueue(deploy, obj, timeout=500)
+                enqueue(deploy, obj, timeout=1800)
                 messages.success(request, _('Deploying %s...' % obj.identifier))
             except Exception, e:
                 logger.exception(u'Error deploying %s: %s' % (obj.identifier, e), e)
