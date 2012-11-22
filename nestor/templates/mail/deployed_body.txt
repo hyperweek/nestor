@@ -1,6 +1,6 @@
 This is your network, delivered by HyperWeek.
 
-Thank you for using HW 2.2. While you're still in trial period, we think
+Thank you for using HW 2.x. While you're still in trial period, we think
 you'll enjoy the app. It's designed to be simple and social from the ground,
 in order to get the most engagement from your users.
 
